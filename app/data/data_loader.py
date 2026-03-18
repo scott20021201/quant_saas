@@ -29,6 +29,24 @@ class DataLoader:
         if df.empty:
             raise ValueError("No data downloaded")
 
+        # 如果是 MultiIndex，就壓平成單層欄位
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = df.columns.get_level_values(0)
+
+        # 統一欄位名稱
+        df = df.rename(columns={"Adj Close": "Adj_Close"})
+
+        # 確保索引名稱正確
+        df.index.name = "Date"
+
+        df = df.sort_index()
+
+        # 存 cache
+        df.to_csv(cache_file)
+
+        if df.empty:
+            raise ValueError("No data downloaded")
+
         df = df.sort_index()
 
         # 存 cache
